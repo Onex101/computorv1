@@ -1,0 +1,4 @@
+mkdir build
+Cmake
+make
+execute program
