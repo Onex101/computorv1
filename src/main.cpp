@@ -36,16 +36,16 @@ int checkDegree(std::string term){
         else if (degree == '2')
             return 2;
     }
-    return -1;
+    return 3;
 }
 
-float performOperation(float term, std::string newTerm, char operation){
-    if (operation == '-')
-
-    else if (operation == '+')
-    
-    else if (operation == '*')
-
+float ft_strtof(std::string s)
+{
+    float number;
+    std::stringstream ss;
+    ss << s;
+    ss >> number;
+    return number;
 }
 
 float sub(float i, float j){
@@ -64,10 +64,11 @@ int main (int argc, char **argv) {
     ++argv;
     std::vector<std::string> terms;
     std::stringstream line;
-    std::string reduced[4];
+    float reduced[4] = {};
     int degree;
     char coefficent;
     char operation;
+    bool swap;
     
     if (*argv){
         std::vector<std::string> terms;
@@ -78,14 +79,41 @@ int main (int argc, char **argv) {
             terms.push_back(term);
         }
         for(int i=0; i < terms.size(); i++){
-            operation = '\0';
+            // std::cout << terms.at(i);
             if (isOperation(terms.at(i), operation)){
-                std::cout << operation;
+                // std::cout << operation;
                 continue;
             }
-            degree = checkDegree(terms.at(i));
-            reduced[degree] = reduced[degree]
-            std::cout << degree;
+            else if (terms.at(i) == "="){
+                swap = false;
+            }
+            else{
+                degree = checkDegree(terms.at(i));
+                std::cout  << ft_strtof(terms.at(i)) << "| Operation: " << operation << "| Degree: " << degree;
+                if (operation == '-'){
+                    if (swap)
+                        reduced[degree] = reduced[degree] - ft_strtof(terms.at(i));
+                    else
+                        reduced[degree] = reduced[degree] + ft_strtof(terms.at(i));
+                }    
+                else if (operation == '+' && swap){
+                    if (swap)
+                        reduced[degree] = reduced[degree] + ft_strtof(terms.at(i));
+                    else
+                        reduced[degree] = reduced[degree] - ft_strtof(terms.at(i));
+                }
+                else if (operation == '*' && swap){
+                    if (swap)
+                        reduced[degree] = reduced[degree] * ft_strtof(terms.at(i));
+                    else
+                        reduced[degree] = reduced[degree] / ft_strtof(terms.at(i));
+                }
+            }
+            // std::cout << degree;
+        }
+        for (int i = 0; i < 4; i++)
+        {
+            std::cout << reduced[i];
         }
     }
     return 0; 
