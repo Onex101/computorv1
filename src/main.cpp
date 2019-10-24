@@ -16,6 +16,10 @@ bool isOperation(std::string term, char &operation){
         operation = '*';
         return true;
     }
+    else if (term == "="){
+        operation = '=';
+        return true;
+    }
     return false;
 }
 
@@ -39,7 +43,7 @@ int checkDegree(std::string term){
     return 3;
 }
 
-float ft_strtof(std::string s)
+float ft_strtof(std::string s, int degree)
 {
     float number;
     std::stringstream ss;
@@ -63,23 +67,47 @@ float mul(float i, float j){
 int main (int argc, char **argv) {
     ++argv;
     std::vector<std::string> terms;
+    std::string operations;
     std::stringstream line;
-    float reduced[4] = {};
+    float reduced[4] = {1 , 1 , 1 , 0};
     int degree;
     char coefficent;
-    char operation;
     bool swap;
+    char * pch;
+    char operation;
     
     if (*argv){
         std::vector<std::string> terms;
         std::string term;
-        std::istringstream termStream(argv[0]);
-        while (std::getline(termStream, term, ' '))
-        {
-            terms.push_back(term);
+        // std::istringstream termStream(argv[0]);
+        // while (std::getline(termStream, term, ' '))
+        // {
+        //     terms.push_back(term);
+        // }
+        std::string str = argv[0];
+        std::string::size_type pos = std::string::npos;
+        std::string prevOperation = "";
+        while ((pos = str.find_first_of("=+-")) != std::string::npos) {
+            std::string str2 = str.substr(0, pos);
+            std::string chars = "* ";
+            for (char c: chars) {
+                str2.erase(std::remove(str2.begin(), str2.end(), c), str2.end());
+            }
+            prevOperation = str.at(pos);
+            if (str2.length() > 0){
+                terms.push_back(str2);
+            }
+            operations += (str.at(pos));
+            std::cout << prevOperation << "\n";
+            str.erase(0, pos + 1);
         }
+        std::string chars = "* ";
+        for (char c: chars) {
+            str.erase(std::remove(str.begin(), str.end(), c), str.end());
+        }
+        terms.push_back(str);
         for(int i=0; i < terms.size(); i++){
-            // std::cout << terms.at(i);
+            std::cout << terms.at(i);
             if (isOperation(terms.at(i), operation)){
                 // std::cout << operation;
                 continue;
@@ -89,31 +117,35 @@ int main (int argc, char **argv) {
             }
             else{
                 degree = checkDegree(terms.at(i));
-                std::cout  << ft_strtof(terms.at(i)) << "| Operation: " << operation << "| Degree: " << degree;
-                if (operation == '-'){
+                std::cout << "| Term " << ft_strtof(terms.at(i), degree);
+                std::cout << "| Operation: " << operation;
+                std::cout << "| Degree: " << degree <<"\n";
+                float value = ft_strtof(terms.at(i), degree);
+                if (operation == '=') {
                     if (swap)
-                        reduced[degree] = reduced[degree] - ft_strtof(terms.at(i));
+                        reduced[degree] += value;
                     else
-                        reduced[degree] = reduced[degree] + ft_strtof(terms.at(i));
-                }    
-                else if (operation == '+' && swap){
-                    if (swap)
-                        reduced[degree] = reduced[degree] + ft_strtof(terms.at(i));
-                    else
-                        reduced[degree] = reduced[degree] - ft_strtof(terms.at(i));
+                        reduced[degree] -= value;
                 }
-                else if (operation == '*' && swap){
+                else if (operation == '-'){
                     if (swap)
-                        reduced[degree] = reduced[degree] * ft_strtof(terms.at(i));
+                        reduced[degree] -= - value;
                     else
-                        reduced[degree] = reduced[degree] / ft_strtof(terms.at(i));
+                        reduced[degree] += value;
+                }    
+                else if (operation == '+'){
+                    if (swap)
+                        reduced[degree] += value;
+                    else
+                        reduced[degree] -= value;
                 }
             }
             // std::cout << degree;
         }
+        std::cout << "\nNew Values: ";
         for (int i = 0; i < 4; i++)
         {
-            std::cout << reduced[i];
+            std::cout << " " << reduced[i];
         }
     }
     return 0; 
