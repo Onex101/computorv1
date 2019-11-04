@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <cmath>
 
 bool isOperation(std::string term, char &operation){
     char tmp = term.at(0);
@@ -49,8 +50,9 @@ bool hasDegree(std::string term){
 }
 
 int checkDegree(std::string term){
+    char degree = term.back();
     if (hasDegree(term)){
-        char degree = term.back();
+        // char degree = term.back();
         if (degree == '0')
             return 0;
         else if (degree == '1')
@@ -58,7 +60,7 @@ int checkDegree(std::string term){
         else if (degree == '2')
             return 2;
     }
-    return 3;
+    return (int)degree - '0';
 }
 
 float ft_strtof(std::string s)
@@ -146,34 +148,81 @@ int main (int argc, char **argv) {
             }
             else{
                 degree = checkDegree(terms.at(i));
+                if (degree > 2 && degree > reduced[3]){
+                    reduced[3] = degree;
+                    continue;
+                }
                 int pos = terms.at(i).find_first_of("X");
                 float value = ft_strtof(terms.at(i).substr(0, pos));
-                if (i < swapNow)
+                if (i <= swapNow)
                         reduced[degree] += value;
                     else
                         reduced[degree] -= value;
             }
         }
-
+        if (reduced[2] < 0)
+            std::cout << reduced[2];
+        std::cout << "\n";
+        std::cout << "Reduced form: ";
         for (int i = 0; i < 3; i++)
         {
-            std::string neg = ft_ftostr(reduced[i] * -1) + " * X^" + ft_ftostr(i);
-            std::string pos = ft_ftostr(reduced[i]) + " * X^" + ft_ftostr(i);
-            if (i == 0){
-                if (reduced[i] < 0)
-                    std::cout << "- " + neg;
-                else
-                    std::cout << pos;
+            if (reduced[i] != 0){
+                std::string neg = ft_ftostr(reduced[i] * -1) + " * X^" + ft_ftostr(i);
+                std::string pos = ft_ftostr(reduced[i]) + " * X^" + ft_ftostr(i);
+                if (i == 0){
+                    if (reduced[i] < 0)
+                        std::cout << "- " + neg;
+                    else
+                        std::cout << pos;
+                }
+                else{
+                    if (reduced[i] < 0)
+                        std::cout << " - " + neg;
+                    else
+                        std::cout << " + " + pos;
+                }
             }
-            else{
-                if (reduced[i] < 0)
-                    std::cout << " - " + neg;
-                else
-                    std::cout << " + " + pos;
+        }
+        
+        float a = reduced[2];
+        float b = reduced[1];
+        float c = reduced[0];
+        std::cout << " = 0\n";
+        if (reduced[3] != 0){
+            std::cout << "Polynomial degree: " + ft_ftostr(reduced[3]) + " \n";
+            std::cout << "The polynomial degree is stricly greater than 2, I can't solve.";
+            return -1;
+        }
+        else if (reduced[2] != 0){
+            std::cout << "Polynomial degree: " + ft_ftostr(2) + " \n";
+            float discriminant = (reduced[1]*reduced[1]) - (4*reduced[0]*reduced[2]);
+            if (discriminant > 0){
+                std::cout << "Discriminant is strictly positive, the two solutions are:\n";
+                float x1 = (-b + sqrt(discriminant)) / (2*a);
+                float x2 = (-b - sqrt(discriminant)) / (2*a);
+                std::cout << "x1 = " << x1 << "\n";
+                std::cout << "x2 = " << x2 << "\n";
+            }
+            else if (discriminant < 0)
+                std::cout << "Discriminant is negative, solution is non real\n";
+            else if (discriminant == 0)
+            {
+                std::cout << "Discriminant is 0:\n";
+                float x1 = (-b + sqrt(discriminant)) / (2*a);
+                std::cout << "x1 = " << x1 << "\n";
             }
         }
 
-        std::cout << " = 0\n";
+        else if (reduced[1] != 0){
+            std::cout << "Polynomial degree: " + ft_ftostr(1) + " \n";
+            float x1 = c / b;
+            std::cout << "x1 = " << x1 << "\n";
+        }
+        else if (reduced[0] != 0){
+            std::cout << "Polynomial degree: " + ft_ftostr(0) + " \n";
+            std::cout << "All real numbers are a solution";
+        }   
+
     }
     return 0; 
 }
